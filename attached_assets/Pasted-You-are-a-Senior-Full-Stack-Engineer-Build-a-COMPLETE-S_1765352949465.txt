@@ -1,0 +1,96 @@
+You are a Senior Full-Stack Engineer.  
+Build a COMPLETE Sudanese Marketplace system similar to Amazon, including:
+
+===========================
+📌 PROJECT COMPONENTS
+===========================
+
+1. **Customer Mobile App**
+   - React Native (Expo) + TypeScript
+   - Full Arabic RTL support (default)
+   - English optional
+   - Features:
+     • Registration/Login (email/phone)
+     • Home screen (banners + categories + featured products)
+     • Product browsing + filters + search
+     • Product details (images, variants, reviews)
+     • Shopping cart
+     • Checkout (Kuwait regions only)
+     • Cash on delivery payment only
+     • Order tracking (Pending → Confirmed → Out for delivery → Delivered)
+     • Wishlist
+     • Profile + Addresses
+     • Orders history
+
+2. **Backend API**
+   - NestJS + TypeScript
+   - Prisma ORM
+   - PostgreSQL database
+   - JWT authentication (customer, seller, admin)
+   - Modules required:
+     • Auth
+     • Users
+     • Sellers
+     • Products
+     • Categories
+     • Orders
+     • OrderItems
+     • Cart
+     • Wishlist
+     • Reviews
+     • Addresses
+     • Banners
+   - File uploads (Cloudinary or local storage)
+   - Swagger documentation
+   - Seed database with Sudanese products
+   - Proper error handling + validation
+
+3. **Seller Dashboard (Web)**
+   - React + TypeScript + Tailwind
+   - Seller login
+   - Manage products (create/edit/delete)
+   - Upload product images
+   - Manage inventory
+   - Manage orders received
+   - Basic sales reports
+   - Update order status
+
+4. **Admin Dashboard (Web)**
+   - React + TypeScript + Tailwind
+   - Admin login
+   - Manage customers, sellers, products, categories
+   - Approve or reject sellers
+   - View all orders
+   - Dashboard statistics
+   - Manage banners & homepage content
+
+===========================
+📌 TECH REQUIREMENTS
+===========================
+- Monorepo structure with:
+  /backend
+  /customer-app
+  /seller-dashboard
+  /admin-dashboard
+
+- Global theme with Sudanese-inspired colors (Gold + Green + White)
+- All apps fully connected to the backend API
+- Use Redux Toolkit + RTK Query in the mobile app
+- Use Axios or RTK Query in dashboards
+
+===========================
+📌 WHAT TO GENERATE NOW
+===========================
+Generate a fully working MVP with:
+
+✔ Backend API fully implemented  
+✔ Database schema + migrations + Prisma models  
+✔ Seller Dashboard core pages  
+✔ Admin Dashboard core pages  
+✔ Mobile App core screens  
+✔ End-to-end order flow working  
+✔ All routing, components, slices, services  
+✔ Seed data  
+✔ README with instructions to run all apps  
+
+Do NOT ask any more questions — proceed to build the full system now.
