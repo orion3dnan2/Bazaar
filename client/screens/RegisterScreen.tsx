@@ -13,7 +13,7 @@ import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollV
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
-import { useAppStore, User } from "@/store";
+import { useAppStore } from "@/store";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -21,37 +21,47 @@ export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   const { theme } = useTheme();
-  const setUser = useAppStore((state) => state.setUser);
+  const register = useAppStore((state) => state.register);
+  const isLoading = useAppStore((state) => state.isLoading);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError("يرجى ملء جميع الحقول المطلوبة");
       return;
     }
 
-    setIsLoading(true);
+    if (password !== confirmPassword) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError("كلمة المرور غير متطابقة");
+      return;
+    }
+
+    if (password.length < 6) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      return;
+    }
+
+    setError("");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const user: User = {
-      id: Date.now().toString(),
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim() || undefined,
-    };
-
-    setUser(user);
-    setIsLoading(false);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    navigation.goBack();
+    try {
+      await register(name.trim(), email.trim(), password, phone.trim() || undefined);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      navigation.goBack();
+    } catch (err: any) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError(err.message || "فشل في إنشاء الحساب");
+    }
   };
 
   return (
@@ -61,81 +71,89 @@ export default function RegisterScreen() {
           paddingTop: Spacing.xl,
           paddingHorizontal: Spacing.lg,
           paddingBottom: insets.bottom + Spacing.xl,
-          flexGrow: 1,
         }}
       >
         <View style={styles.header}>
-          <ThemedText type="hero">Create Account</ThemedText>
+          <ThemedText type="hero">إنشاء حساب</ThemedText>
           <ThemedText type="body" style={{ color: theme.textMuted, marginTop: Spacing.sm }}>
-            Join the Sudanese Bazaar community
+            انضم إلينا وابدأ التسوق
           </ThemedText>
         </View>
+
+        {error ? (
+          <View style={[styles.errorBox, { backgroundColor: theme.error + "20" }]}>
+            <Feather name="alert-circle" size={16} color={theme.error} />
+            <ThemedText type="caption" style={{ color: theme.error, marginLeft: Spacing.sm }}>
+              {error}
+            </ThemedText>
+          </View>
+        ) : null}
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
             <ThemedText type="caption" style={styles.label}>
-              Full Name
+              الاسم الكامل *
             </ThemedText>
             <View style={[styles.inputContainer, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
               <Feather name="user" size={20} color={theme.textMuted} />
               <TextInput
-                placeholder="Enter your name"
+                placeholder="أدخل اسمك الكامل"
                 placeholderTextColor={theme.textMuted}
                 value={name}
                 onChangeText={setName}
-                style={[styles.input, { color: theme.text }]}
+                style={[styles.input, { color: theme.text, textAlign: "right" }]}
               />
             </View>
           </View>
 
           <View style={styles.inputGroup}>
             <ThemedText type="caption" style={styles.label}>
-              Email
+              البريد الإلكتروني *
             </ThemedText>
             <View style={[styles.inputContainer, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
               <Feather name="mail" size={20} color={theme.textMuted} />
               <TextInput
-                placeholder="Enter your email"
+                placeholder="أدخل بريدك الإلكتروني"
                 placeholderTextColor={theme.textMuted}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                style={[styles.input, { color: theme.text }]}
+                style={[styles.input, { color: theme.text, textAlign: "right" }]}
               />
             </View>
           </View>
 
           <View style={styles.inputGroup}>
             <ThemedText type="caption" style={styles.label}>
-              Phone (Optional)
+              رقم الهاتف (اختياري)
             </ThemedText>
             <View style={[styles.inputContainer, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
               <Feather name="phone" size={20} color={theme.textMuted} />
               <TextInput
-                placeholder="Enter your phone number"
+                placeholder="أدخل رقم هاتفك"
                 placeholderTextColor={theme.textMuted}
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
-                style={[styles.input, { color: theme.text }]}
+                style={[styles.input, { color: theme.text, textAlign: "right" }]}
               />
             </View>
           </View>
 
           <View style={styles.inputGroup}>
             <ThemedText type="caption" style={styles.label}>
-              Password
+              كلمة المرور *
             </ThemedText>
             <View style={[styles.inputContainer, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
               <Feather name="lock" size={20} color={theme.textMuted} />
               <TextInput
-                placeholder="Create a password"
+                placeholder="أدخل كلمة المرور"
                 placeholderTextColor={theme.textMuted}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
-                style={[styles.input, { color: theme.text }]}
+                style={[styles.input, { color: theme.text, textAlign: "right" }]}
               />
               <Pressable onPress={() => setShowPassword(!showPassword)}>
                 <Feather
@@ -147,17 +165,34 @@ export default function RegisterScreen() {
             </View>
           </View>
 
+          <View style={styles.inputGroup}>
+            <ThemedText type="caption" style={styles.label}>
+              تأكيد كلمة المرور *
+            </ThemedText>
+            <View style={[styles.inputContainer, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
+              <Feather name="lock" size={20} color={theme.textMuted} />
+              <TextInput
+                placeholder="أعد إدخال كلمة المرور"
+                placeholderTextColor={theme.textMuted}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showPassword}
+                style={[styles.input, { color: theme.text, textAlign: "right" }]}
+              />
+            </View>
+          </View>
+
           <Button onPress={handleRegister} disabled={isLoading} style={styles.registerButton}>
-            {isLoading ? "Creating Account..." : "Create Account"}
+            {isLoading ? "جاري إنشاء الحساب..." : "إنشاء حساب"}
           </Button>
         </View>
 
         <View style={styles.footer}>
           <ThemedText type="body" style={{ color: theme.textMuted }}>
-            Already have an account?{" "}
+            لديك حساب بالفعل؟{" "}
           </ThemedText>
           <Pressable onPress={() => navigation.replace("Login")}>
-            <ThemedText type="link">Sign In</ThemedText>
+            <ThemedText type="link">تسجيل الدخول</ThemedText>
           </Pressable>
         </View>
       </KeyboardAwareScrollViewCompat>
@@ -171,6 +206,13 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: Spacing["3xl"],
+  },
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.lg,
   },
   form: {
     flex: 1,
@@ -195,7 +237,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   registerButton: {
-    marginTop: Spacing.xl,
+    marginTop: Spacing.md,
   },
   footer: {
     flexDirection: "row",

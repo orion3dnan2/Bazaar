@@ -27,8 +27,9 @@ import { ProductCard } from "@/components/ProductCard";
 import { CategoryCard } from "@/components/CategoryCard";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
+import { useProducts, useCategories } from "@/hooks/useProducts";
 import { Spacing, BorderRadius, Typography } from "@/constants/theme";
-import { products, categories, banners } from "@/data/mockData";
+import { banners } from "@/data/mockData";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useAppStore } from "@/store";
 
@@ -49,6 +50,9 @@ export default function HomeScreen() {
   const cart = useAppStore((state) => state.cart);
   const getCartItemCount = useAppStore((state) => state.getCartItemCount);
 
+  const { products, loading: productsLoading, refetch: refetchProducts } = useProducts();
+  const { categories, loading: categoriesLoading, refetch: refetchCategories } = useCategories();
+
   const featuredProducts = products.slice(0, 4);
   const popularProducts = products.slice(2, 6);
   const newArrivals = products.slice(4, 8);
@@ -62,9 +66,10 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, [activeBannerIndex]);
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+    await Promise.all([refetchProducts(), refetchCategories()]);
+    setRefreshing(false);
   };
 
   const renderBanner = ({ item, index }: { item: typeof banners[0]; index: number }) => (

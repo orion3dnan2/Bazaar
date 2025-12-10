@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TextInput, Pressable } from "react-native";
+import { View, StyleSheet, TextInput, Pressable, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -13,7 +13,7 @@ import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollV
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
-import { useAppStore, User } from "@/store";
+import { useAppStore } from "@/store";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -21,34 +21,32 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   const { theme } = useTheme();
-  const setUser = useAppStore((state) => state.setUser);
+  const login = useAppStore((state) => state.login);
+  const isLoading = useAppStore((state) => state.isLoading);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError("يرجى إدخال البريد الإلكتروني وكلمة المرور");
       return;
     }
 
-    setIsLoading(true);
+    setError("");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const user: User = {
-      id: Date.now().toString(),
-      name: email.split("@")[0],
-      email: email.trim(),
-    };
-
-    setUser(user);
-    setIsLoading(false);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    navigation.goBack();
+    try {
+      await login(email.trim(), password);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      navigation.goBack();
+    } catch (err: any) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError(err.message || "فشل في تسجيل الدخول");
+    }
   };
 
   return (
@@ -62,44 +60,53 @@ export default function LoginScreen() {
         }}
       >
         <View style={styles.header}>
-          <ThemedText type="hero">Welcome Back</ThemedText>
+          <ThemedText type="hero">مرحباً بعودتك</ThemedText>
           <ThemedText type="body" style={{ color: theme.textMuted, marginTop: Spacing.sm }}>
-            Sign in to continue shopping
+            سجل دخولك للاستمرار في التسوق
           </ThemedText>
         </View>
+
+        {error ? (
+          <View style={[styles.errorBox, { backgroundColor: theme.error + "20" }]}>
+            <Feather name="alert-circle" size={16} color={theme.error} />
+            <ThemedText type="caption" style={{ color: theme.error, marginLeft: Spacing.sm }}>
+              {error}
+            </ThemedText>
+          </View>
+        ) : null}
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
             <ThemedText type="caption" style={styles.label}>
-              Email
+              البريد الإلكتروني
             </ThemedText>
             <View style={[styles.inputContainer, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
               <Feather name="mail" size={20} color={theme.textMuted} />
               <TextInput
-                placeholder="Enter your email"
+                placeholder="أدخل بريدك الإلكتروني"
                 placeholderTextColor={theme.textMuted}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                style={[styles.input, { color: theme.text }]}
+                style={[styles.input, { color: theme.text, textAlign: "right" }]}
               />
             </View>
           </View>
 
           <View style={styles.inputGroup}>
             <ThemedText type="caption" style={styles.label}>
-              Password
+              كلمة المرور
             </ThemedText>
             <View style={[styles.inputContainer, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
               <Feather name="lock" size={20} color={theme.textMuted} />
               <TextInput
-                placeholder="Enter your password"
+                placeholder="أدخل كلمة المرور"
                 placeholderTextColor={theme.textMuted}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
-                style={[styles.input, { color: theme.text }]}
+                style={[styles.input, { color: theme.text, textAlign: "right" }]}
               />
               <Pressable onPress={() => setShowPassword(!showPassword)}>
                 <Feather
@@ -112,20 +119,20 @@ export default function LoginScreen() {
           </View>
 
           <Pressable style={styles.forgotPassword}>
-            <ThemedText type="link">Forgot Password?</ThemedText>
+            <ThemedText type="link">نسيت كلمة المرور؟</ThemedText>
           </Pressable>
 
           <Button onPress={handleLogin} disabled={isLoading} style={styles.loginButton}>
-            {isLoading ? "Signing In..." : "Sign In"}
+            {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
           </Button>
         </View>
 
         <View style={styles.footer}>
           <ThemedText type="body" style={{ color: theme.textMuted }}>
-            Don't have an account?{" "}
+            ليس لديك حساب؟{" "}
           </ThemedText>
           <Pressable onPress={() => navigation.replace("Register")}>
-            <ThemedText type="link">Sign Up</ThemedText>
+            <ThemedText type="link">إنشاء حساب</ThemedText>
           </Pressable>
         </View>
       </KeyboardAwareScrollViewCompat>
@@ -139,6 +146,13 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: Spacing["3xl"],
+  },
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.lg,
   },
   form: {
     flex: 1,
