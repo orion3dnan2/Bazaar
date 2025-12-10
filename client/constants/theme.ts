@@ -1,30 +1,66 @@
 import { Platform } from "react-native";
 
-const tintColorLight = "#007AFF";
-const tintColorDark = "#0A84FF";
+// Sudanese-inspired color palette
+const sudaneseGold = "#D4AF37";
+const sudaneseGreen = "#007A3D";
+const sudaneseGoldDark = "#FFD700";
 
 export const Colors = {
   light: {
-    text: "#11181C",
+    text: "#111827",
+    textSecondary: "#374151",
+    textMuted: "#9CA3AF",
     buttonText: "#FFFFFF",
-    tabIconDefault: "#687076",
-    tabIconSelected: tintColorLight,
-    link: "#007AFF",
-    backgroundRoot: "#FFFFFF", // Elevation 0
-    backgroundDefault: "#F2F2F2", // Elevation 1
-    backgroundSecondary: "#E6E6E6", // Elevation 2
-    backgroundTertiary: "#D9D9D9", // Elevation 3
+    tabIconDefault: "#9CA3AF",
+    tabIconSelected: sudaneseGold,
+    link: sudaneseGold,
+    primary: sudaneseGold,
+    primaryPressed: "#B8972F",
+    secondary: sudaneseGreen,
+    secondaryPressed: "#006432",
+    success: sudaneseGreen,
+    error: "#DC2626",
+    warning: "#F59E0B",
+    info: "#3B82F6",
+    backgroundRoot: "#FFFFFF",
+    backgroundDefault: "#F9FAFB",
+    backgroundSecondary: "#F3F4F6",
+    backgroundTertiary: "#E5E7EB",
+    border: "#E5E7EB",
+    borderFocused: sudaneseGold,
+    cardBackground: "#FFFFFF",
+    skeleton: "#E5E7EB",
+    overlay: "rgba(0, 0, 0, 0.5)",
+    price: sudaneseGold,
+    rating: "#F59E0B",
   },
   dark: {
-    text: "#ECEDEE",
+    text: "#F9FAFB",
+    textSecondary: "#D1D5DB",
+    textMuted: "#9CA3AF",
     buttonText: "#FFFFFF",
-    tabIconDefault: "#9BA1A6",
-    tabIconSelected: tintColorDark,
-    link: "#0A84FF",
-    backgroundRoot: "#1F2123", // Elevation 0
-    backgroundDefault: "#2A2C2E", // Elevation 1
-    backgroundSecondary: "#353739", // Elevation 2
-    backgroundTertiary: "#404244", // Elevation 3
+    tabIconDefault: "#6B7280",
+    tabIconSelected: sudaneseGoldDark,
+    link: sudaneseGoldDark,
+    primary: sudaneseGoldDark,
+    primaryPressed: "#E6C200",
+    secondary: sudaneseGreen,
+    secondaryPressed: "#006432",
+    success: sudaneseGreen,
+    error: "#EF4444",
+    warning: "#FBBF24",
+    info: "#60A5FA",
+    backgroundRoot: "#121212",
+    backgroundDefault: "#1E1E1E",
+    backgroundSecondary: "#2A2A2A",
+    backgroundTertiary: "#3A3A3A",
+    border: "#374151",
+    borderFocused: sudaneseGoldDark,
+    cardBackground: "#1E1E1E",
+    skeleton: "#374151",
+    overlay: "rgba(0, 0, 0, 0.7)",
+    price: sudaneseGoldDark,
+    rating: "#FBBF24",
   },
 };
 
@@ -40,66 +76,117 @@ export const Spacing = {
   "5xl": 48,
   inputHeight: 48,
   buttonHeight: 52,
+  cardPadding: 16,
+  screenPadding: 16,
 };
 
 export const BorderRadius = {
-  xs: 8,
-  sm: 12,
-  md: 18,
-  lg: 24,
-  xl: 30,
-  "2xl": 40,
-  "3xl": 50,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  "2xl": 24,
+  "3xl": 32,
   full: 9999,
 };
 
 export const Typography = {
-  h1: {
+  hero: {
     fontSize: 32,
-    lineHeight: 40,
+    fontWeight: "700" as const,
+  },
+  h1: {
+    fontSize: 24,
     fontWeight: "700" as const,
   },
   h2: {
-    fontSize: 28,
-    lineHeight: 36,
-    fontWeight: "700" as const,
-  },
-  h3: {
-    fontSize: 24,
-    lineHeight: 32,
+    fontSize: 20,
     fontWeight: "600" as const,
   },
-  h4: {
-    fontSize: 20,
-    lineHeight: 28,
+  h3: {
+    fontSize: 18,
     fontWeight: "600" as const,
   },
   body: {
     fontSize: 16,
-    lineHeight: 24,
+    fontWeight: "400" as const,
+  },
+  caption: {
+    fontSize: 14,
     fontWeight: "400" as const,
   },
   small: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 12,
     fontWeight: "400" as const,
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: "700" as const,
   },
   link: {
     fontSize: 16,
-    lineHeight: 24,
-    fontWeight: "400" as const,
+    fontWeight: "500" as const,
   },
+};
+
+export const Shadows = {
+  none: {},
+  sm: Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+    },
+    android: {
+      elevation: 1,
+    },
+    default: {},
+  }),
+  md: Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    android: {
+      elevation: 3,
+    },
+    default: {},
+  }),
+  lg: Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+    },
+    android: {
+      elevation: 6,
+    },
+    default: {},
+  }),
+  fab: Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+    },
+    android: {
+      elevation: 4,
+    },
+    default: {},
+  }),
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: "system-ui",
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: "ui-serif",
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: "ui-rounded",
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: "ui-monospace",
   },
   default: {
